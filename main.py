@@ -42,13 +42,17 @@ def input():
 def upload():
     df = pd.read_csv(w.file.displayText(), delimiter=',',header=None)
     w.tableWidget.clear()
+    w.impulse_table.clear()
 
     w.tableWidget.setCornerButtonEnabled(False)
+    w.impulse_table.setCornerButtonEnabled(False)
     w.tableWidget.setColumnCount(len(df))
+    w.impulse_table.setColumnCount(len(df))
     w.tableWidget.setRowCount(len(df))
+    w.impulse_table.setRowCount(1)
 
     w.tableWidget.setSortingEnabled(False)
-
+    w.impulse_table.setSortingEnabled(False)
     for i in range(len(df)):
 
             #w.tableWidget.horizontalHeader.setDefaultSectionSize(60)
@@ -63,6 +67,14 @@ def upload():
             item = w.tableWidget.horizontalHeaderItem(i)
             item.setText(str(i+1))
 
+            w.impulse_table.setHorizontalHeaderItem(i, item)
+            item = w.impulse_table.horizontalHeaderItem(i)
+            item.setText(str(i+1))
+
+
+            w.impulse_table.setItem(0, i, QTableWidgetItem("0"))
+            w.impulse_table.setColumnWidth(i, 50)
+
     for i in range(len(df)):
         for j in range(len(df)):
                 item = QTableWidgetItem()
@@ -70,6 +82,9 @@ def upload():
                 w.tableWidget.setItem(i, j, item)
         w.tableWidget.setColumnWidth(i, 50)
         w.tableWidget.setRowHeight(i, 50)
+        item = QTableWidgetItem()
+        item.setText(str(0))
+        w.impulse_table.setItem(0, i, item)
     #w.tableWidget.resizeRowsToContents()
 
 def remove():
@@ -80,8 +95,13 @@ def remove():
             c = k.column()
             w.tableWidget.removeColumn(c)
             w.tableWidget.removeRow(c)
+            removeB(c)
         except:
             QMessageBox.warning(w,'Error','Нема виділених даних')
+
+def removeB(k):
+    w.impulse_table.removeColumn(k)
+
 
 
 def add():
@@ -89,15 +109,20 @@ def add():
         r = w.tableWidget.rowCount()
         w.tableWidget.setColumnCount(r + 1)
         w.tableWidget.setRowCount(r + 1)
+        w.impulse_table.setColumnCount(r + 1)
         w.tableWidget.setHorizontalHeaderItem(r, QTableWidgetItem(name))
         w.tableWidget.setVerticalHeaderItem(r, QTableWidgetItem(name))
+        w.impulse_table.setHorizontalHeaderItem(r, QTableWidgetItem(name))
         w.tableWidget.setColumnWidth(r, 50)
         w.tableWidget.setRowHeight(r, 50)
+        w.impulse_table.setColumnWidth(r, 50)
 
         for i in range(r + 1):
             item = '0'
             w.tableWidget.setItem(i, r, QTableWidgetItem(item))
             w.tableWidget.setItem(r, i, QTableWidgetItem(item))
+        item = '0'
+        w.impulse_table.setItem(0, r, QTableWidgetItem(item))
 
 def get_A():
         A = []
@@ -110,6 +135,13 @@ def get_A():
                 A_row.append(val)
             A.append(np.array(A_row))
         return np.array(A)
+
+def get_B():
+    B = []
+    for i in range(w.impulse_table.columnCount()):
+        val = float(w.impulse_table.item(0, i).text())
+        B.append(val)
+    return np.array(B)
 
 def analise():
         A = get_A()
@@ -139,35 +171,6 @@ def analise():
         else:
             cycle_str = lambda x: ' - '.join(w.tableWidget.verticalHeaderItem(y).text() for y in x)
             results += 'No \n(' + ', \n'.join(cycle_str(x) for x in cycles) + ')'
-        t = 5
-        q = [0, 0, 0]
-        for i in range(3,w.tableWidget.rowCount(), 1):
-            q.append(0)
-        q[0] = 1
-        cognitiveModel.impulse_model(t=t, q=q)
-
-        q = [0, 0, 0]
-        for i in range(3,w.tableWidget.rowCount(), 1):
-            q.append(0)
-        q[2] = 1
-        cognitiveModel.impulse_model(t=t, q=q)
-
-        q = [0, 0, 0]
-        for i in range(3,w.tableWidget.rowCount(), 1):
-            q.append(0)
-        q[0] = 1
-        q[1] = 1
-        cognitiveModel.impulse_model(t=t, q=q)
-
-        q = [0, 0, 0]
-        for i in range(3,w.tableWidget.rowCount(), 1):
-            q.append(0)
-        q[1] = 1
-        try:
-            q[5] = 1
-        except:
-            print('kek')
-        cognitiveModel.impulse_model(t=t, q=q)
 
         w.result.setText(results)
 
@@ -181,10 +184,24 @@ def graph():
         cognitiveModel = CognitiveModel(A)
         cognitiveModel.draw_graph()
 
+
+def impulse():
+    A = get_A()
+    if A.any() == None:
+        QMessageBox.warning(w, 'Error', 'Error parsing matrix')
+    cognitiveModel = CognitiveModel(A)
+
+    B = get_B()
+
+    t = 5
+    cognitiveModel.impulse_model(t=t, q=B)
+
+
 w.tool.clicked.connect(input)
 w.upload.clicked.connect(upload)
 w.remove.clicked.connect(remove)
 w.add.clicked.connect(add)
 w.analise.clicked.connect(analise)
 w.graph.clicked.connect(graph)
+w.impulse.clicked.connect(impulse)
 app.exec_()
