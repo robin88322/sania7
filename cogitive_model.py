@@ -60,7 +60,9 @@ class CognitiveModel:
 
     def draw_graph(self):
         colors = ['y' if self.graph_weights[edge] > 0 else 'r' for edge in self.graph.edges_iter()]
-        nx.draw_networkx(self.graph, pos=nx.circular_layout(self.graph), arrows=True, with_labels=True, edge_color=colors, font_size=12, font_color="#ffffff", node_color="b")
+        labels  = nx.get_edge_attributes(self.graph,'weight')
+        nx.draw_networkx(self.graph, pos=nx.circular_layout(self.graph), arrows=True, with_labels=True, edge_color=colors, font_size=12, font_color="#ffffff", node_color="b" )
+        nx.draw_networkx_edge_labels(self.graph,pos=nx.circular_layout(self.graph),edge_labels=labels, label_pos=0.2, font_size=8, clip_on=False)
         plt.show()
 
     def impulse_model(self, t: int = 5, q: Optional[np.ndarray] = None) -> NoReturn:
@@ -85,7 +87,7 @@ class CognitiveModel:
         for index in range(x_plot.shape[1]):
             plt.plot(range(t + 1), x_plot[:, index], label=f"V{index + 1}")
         plt.title(f"Графік імпульсних процесів у вершинах внаслідок \n внесення збурення q = {save_q.reshape(-1, )}")
-        plt.xlabel("Кроки")
+        plt.xlabel("Час, t")
         plt.ylabel("x(t)")
         plt.legend()
         plt.show()

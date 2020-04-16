@@ -202,7 +202,6 @@ class AppWindow(QMainWindow, form_class):
         for c in range(self.main_table.columnCount()):
             it = self.main_table.horizontalHeaderItem(c)
             item = QTableWidgetItem()
-            print(c)
             self.impulse_table.setHorizontalHeaderItem(c, item)
             item = self.impulse_table.horizontalHeaderItem(c)
             item.setText(str(it.text()))
