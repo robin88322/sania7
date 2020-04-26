@@ -155,7 +155,7 @@ class AppWindow(QMainWindow, form_class):
             results += 'True' if cognitiveModel.check_perturbation_stability() else 'False'
             results += ' \n '
 
-            results += ' Стійкість значення: '
+            results += 'Стійкість значення: '
             results += 'True' if cognitiveModel.check_numerical_stability() else 'False'
             results += ' \n '
             results += ' \n '
@@ -187,7 +187,7 @@ class AppWindow(QMainWindow, form_class):
             QMessageBox.warning(w, 'Error', 'Error parsing matrix')
         cognitiveModel = CognitiveModel(A)
         B = self.get_B()
-        t = 5
+        t = 7
         cognitiveModel.impulse_model(t=t, q=B)
 
     @pyqtSlot()

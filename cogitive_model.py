@@ -10,7 +10,7 @@ from pylab import rcParams
 class CognitiveModel:
     def __init__(self, adjacency_matrix, nodes_names=None):
         self.graph = nx.DiGraph(data=adjacency_matrix)
-        if nodes_names:
+        if True:
             nx.set_node_attributes(self.graph, 'name', nodes_names)
 
     @property
